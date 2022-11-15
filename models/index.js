@@ -1,15 +1,19 @@
 const dbConfig = require("../config/db.config.js");
 
 const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 mongoose.Promise = global.Promise;
 
 const db = {};
 db.mongoose = mongoose;
 db.url = dbConfig.url;
-db.book = require("./book.js")(mongoose);
-db.room = require("./room.js")(mongoose)
-db.roomsReservations = require("./roomsReservations.js")(mongoose)
-db.table = require("./table.js")(mongoose)
-db.tablesReservations = require("./tablesReservations.js")(mongoose)
+
+const roomSchema = require("./room.js")(mongoose);
+roomSchema.plugin(AutoIncrement);
+db.room = mongoose.model('room', roomSchema);
+
+const tableSchema = require("./table.js")(mongoose)
+tableSchema.plugin(AutoIncrement, {id: 'table_counter'});
+db.table = mongoose.model('table', tableSchema);
 
 module.exports = db;

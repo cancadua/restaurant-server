@@ -1,23 +1,13 @@
 const db = require("../models");
+const AutoIncrement = require("../models");
 const Room = db.room;
 
 // Create and Save a new Room
 exports.addRoom = (req, res) => {
-    // Validate request
-    if (!(req.body._id && req.body.max_seats)) {
-        res.status(400).send({ message: "Room number and amount of seats can not be empty!" });
-        return;
-    }
 
-    // Create a Room
-    const room = new Room({
-        _id: req.body._id,
-        max_seats: req.body.max_seats
-    });
+    const room = new Room();
 
-    // Save Room in the database
-    room
-        .save(room)
+    room.save(room)
         .then(data => {
             res.send(data);
         })
@@ -28,6 +18,8 @@ exports.addRoom = (req, res) => {
             });
         });
 };
+
+
 // Retrieve all Rooms from the database.
 exports.findAllRooms = (req, res) => {
     Room.find({}).select('-__v')
@@ -38,6 +30,21 @@ exports.findAllRooms = (req, res) => {
             res.status(500).send({
                 message:
                     err.message || "Some error occurred while retrieving rooms."
+            });
+        });
+};
+
+exports.findRoom = (req, res) => {
+    console.log(req.params.id)
+    Room.find({ room_id: req.params.id })
+        .then(data => {
+            console.log(data)
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "Some error occurred while retrieving books."
             });
         });
 };

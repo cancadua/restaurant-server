@@ -1,24 +1,18 @@
 const db = require("../models");
 const Table = db.table;
 
-// Create and Save a new Table
 exports.addTable = (req, res) => {
-    // Validate request
-    if (!(req.body._id && req.body.room_id && req.body.max_seats)) {
+    if (!(req.body.room_id && req.body.max_seats)) {
         res.status(400).send({ message: "Table number and amount of seats can not be empty!" });
         return;
     }
 
-    // Create a Table
     const table = new Table({
-        _id: req.body._id,
         room_id: req.body.room_id,
         max_seats: req.body.max_seats
     });
 
-    // Save Table in the database
-    table
-        .save(table)
+    table.save(table)
         .then(data => {
             res.send(data);
         })
@@ -30,9 +24,22 @@ exports.addTable = (req, res) => {
         });
 };
 
+
+exports.findTable = (req, res) => {
+    Table.find({ _id: req.params.id })
+        .then(data => {
+            res.send(data[0]);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "Some error occurred while retrieving books."
+            });
+        });
+};
+
 // Find all published Books
 exports.findRoomTables = (req, res) => {
-
     Table.find({ room_id: req.params.id })
         .then(data => {
             res.send(data);
@@ -67,7 +74,6 @@ exports.modifyTable = (req, res) => {
             message: "Data to update can not be empty!"
         });
     }
-
     const id = req.params.id;
 
     Table.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
